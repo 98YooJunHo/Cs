@@ -98,17 +98,17 @@ namespace _230616_WarmUp
                     if (map[y, x]%2 == 0 && map[y,x] !=0)
                     {
                         Console.ForegroundColor = ConsoleColor.DarkYellow;
-                        Console.Write("{0} ", map[y, x]);
+                        Console.Write("{0,4} ", map[y, x]);
                         Console.ResetColor();
                     }
                     else
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
-                        Console.Write("{0} ", map[y, x]);
+                        Console.Write("{0,4} ", map[y, x]);
                         Console.ResetColor();
                     }
                 }
-                Console.WriteLine();
+                Console.WriteLine("\n\n");
             }
         }
 
