@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+// By YJH
+
 namespace _230616_WarmUp
 {
     public class _2048
@@ -38,10 +40,39 @@ namespace _230616_WarmUp
 
             while(true)
             {
-                Make_1();
+                Make_2();
+                Clear_Map();
                 Print_Map();
-                Move_1();
+                Move_2();
             }
+        }
+
+        void Clear_Map()
+        {
+            Console.SetCursorPosition(0, 0);
+            Console.WriteLine("                                                                                 ");
+            Console.WriteLine("                                                                                 ");
+            Console.WriteLine("                                                                                 ");
+            Console.WriteLine("                                                                                 ");
+            Console.WriteLine("                                                                                 ");
+            Console.WriteLine("                                                                                 ");
+            Console.WriteLine("                                                                                 ");
+            Console.WriteLine("                                                                                 ");
+            Console.WriteLine("                                                                                 ");
+            Console.WriteLine("                                                                                 ");
+            Console.WriteLine("                                                                                 ");
+            Console.WriteLine("                                                                                 ");
+            Console.WriteLine("                                                                                 ");
+            Console.WriteLine("                                                                                 ");
+            Console.WriteLine("                                                                                 ");
+            Console.WriteLine("                                                                                 ");
+            Console.WriteLine("                                                                                 ");
+            Console.WriteLine("                                                                                 ");
+            Console.WriteLine("                                                                                 ");
+            Console.WriteLine("                                                                                 ");
+            Console.WriteLine("                                                                                 ");
+            Console.WriteLine("                                                                                 ");
+            Console.SetCursorPosition(0, 0);
         }
 
         void Make_Map()
@@ -62,9 +93,9 @@ namespace _230616_WarmUp
             {
                 for (int x = 0; x < mapSize; x++)
                 {
-                    if (map[y, x] == 1 || map[y, x] == 2 || map[y, x] == 4 || map[y, x] == 8 || 
-                        map[y, x] == 16 || map[y, x] == 32 || map[y, x] == 64 || map[y, x] == 128 || 
-                        map[y, x] == 256 || map[y, x] == 512 || map[y, x] == 1024 || map[y, x] == 2048)
+                    if (map[y, x] == 2 || map[y, x] == 4 || map[y, x] == 8 || map[y, x] == 16 || 
+                        map[y, x] == 32 || map[y, x] == 64 || map[y, x] == 128 || map[y, x] == 256 || 
+                        map[y, x] == 512 || map[y, x] == 1024 || map[y, x] == 2048 || map[y, x] == 4096)
                     {
                         Console.ForegroundColor = ConsoleColor.DarkYellow;
                         Console.Write("{0} ", map[y, x]);
@@ -87,7 +118,7 @@ namespace _230616_WarmUp
             }
         }
 
-        void Make_1()
+        void Make_2()
         {
             Random random = new Random();
             int randomIndex = random.Next(0, mapSize * mapSize);
@@ -97,7 +128,7 @@ namespace _230616_WarmUp
                 {
                     if (map[(randomIndex / mapSize), (randomIndex % mapSize)] == 0)
                     {
-                        map[(randomIndex / mapSize), (randomIndex % mapSize)] = 1;
+                        map[(randomIndex / mapSize), (randomIndex % mapSize)] = 2;
                         break;
                     }
                     else
@@ -109,7 +140,7 @@ namespace _230616_WarmUp
             }
         }
 
-        void Move_1()
+        void Move_2()
         {
             Console.SetCursorPosition(0, 1);
             Console.Write("위 w, 왼쪽 a, 아래 s, 오른쪽 d : ");
@@ -156,7 +187,7 @@ namespace _230616_WarmUp
                             }
                             else if (map[y-1, x] == map[y, x])    // 본 숫자가 0이 아니고 본 숫자와 왼쪽 숫자가 같은경우
                             {
-                                map[y, x] += map[y, x - 1];         // 본 숫자에 왼쪽 숫자 더하고
+                                map[y, x] += map[y-1, x];         // 본 숫자에 왼쪽 숫자 더하고
                                 map[y-1, x] = 0;                  // 왼쪽 숫자 초기화
                             }
                             else { /*pass*/ }
@@ -213,7 +244,6 @@ namespace _230616_WarmUp
                 }
             }
         }
-
 
     }
 }
