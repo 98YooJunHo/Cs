@@ -37,16 +37,16 @@ namespace _230616_WarmUp
             }      // 지정한 범위 이외의 값 예외처리
 
             Make_Map();
-
+            Make_2();
             while(true)
             {
-                Make_2();
                 Clear_Map();
                 Print_Map();
                 Move_2();
             }
         }
 
+        // 맵을 지우는 함수
         void Clear_Map()
         {
             Console.SetCursorPosition(0, 0);
@@ -75,6 +75,7 @@ namespace _230616_WarmUp
             Console.SetCursorPosition(0, 0);
         }
 
+        // 맵을 만드는 함수
         void Make_Map()
         {
             for (int y = 0; y < mapSize; y++)
@@ -86,6 +87,7 @@ namespace _230616_WarmUp
             }
         }
 
+        // 맵을 출력하는 함수
         void Print_Map()
         {
             Console.SetCursorPosition(0, 3);
@@ -93,20 +95,12 @@ namespace _230616_WarmUp
             {
                 for (int x = 0; x < mapSize; x++)
                 {
-                    if (map[y, x] == 2 || map[y, x] == 4 || map[y, x] == 8 || map[y, x] == 16 || 
-                        map[y, x] == 32 || map[y, x] == 64 || map[y, x] == 128 || map[y, x] == 256 || 
-                        map[y, x] == 512 || map[y, x] == 1024 || map[y, x] == 2048 || map[y, x] == 4096)
+                    if (map[y, x]%2 == 0 && map[y,x] !=0)
                     {
                         Console.ForegroundColor = ConsoleColor.DarkYellow;
                         Console.Write("{0} ", map[y, x]);
                         Console.ResetColor();
                     }
-                    //else if (map[y, x] == 0)
-                    //{
-                    //    Console.ForegroundColor = ConsoleColor.Red;
-                    //    Console.Write("{0} ", map[y, x]);
-                    //    Console.ResetColor();
-                    //}
                     else
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
@@ -118,28 +112,30 @@ namespace _230616_WarmUp
             }
         }
 
+        // 맵에 랜덤으로 2를 만드는 함수
         void Make_2()
         {
             Random random = new Random();
-            int randomIndex = random.Next(0, mapSize * mapSize);
+            int randomIndex = random.Next(0, mapSize * mapSize);                // 2차원 배열에 랜덤인덱스를 넣기 위해 배열크기의 제곱까지 랜덤인덱스숫자 저장
             for (int i = 0; i < 1; i++)
             {
                 while (true)
                 {
-                    if (map[(randomIndex / mapSize), (randomIndex % mapSize)] == 0)
+                    if (map[(randomIndex / mapSize), (randomIndex % mapSize)] == 0) // 해당 인덱스의 값이 0이라면
                     {
-                        map[(randomIndex / mapSize), (randomIndex % mapSize)] = 2;
+                        map[(randomIndex / mapSize), (randomIndex % mapSize)] = 2;  // 2대입
                         break;
                     }
-                    else
+                    else                                                            // 해당 인덱스의 값이 0이 아니라면
                     {
-                        randomIndex = random.Next(0, mapSize * mapSize);
+                        randomIndex = random.Next(0, mapSize * mapSize);            // 다시 섞음
                         continue;
                     }
                 }
             }
         }
 
+        // 숫자를 옮기는 함수
         void Move_2()
         {
             Console.SetCursorPosition(0, 1);
@@ -151,77 +147,80 @@ namespace _230616_WarmUp
             {
                 for (int x = 0; x < mapSize; x++)
                 {
-                    for (int i = 0; i < mapSize; i++)           // 맵 크기 만큼 x정렬 반복
+                    for (int i = 0; i < mapSize; i++)               // 맵 크기 만큼 y정렬 반복
                     {
                         for (int y = 0; y < mapSize - 1; y++)
                         {
                             if (map[y, x] == 0)                     // 본 숫자가 0인 경우
                             {
-                                temp = map[y + 1, x];           // 오른쪽 으로 밈
+                                temp = map[y + 1, x];               // 아래쪽 으로 밈
                                 map[y + 1, x] = map[y, x];
                                 map[y, x] = temp;
                             }
-                            else if (map[y + 1, x] == map[y, x])    // 본 숫자가 0이 아니고 본 숫자와 왼쪽 숫자가 같은경우
+                            else if (map[y + 1, x] == map[y, x])    // 본 숫자가 0이 아니고 본 숫자와 아래쪽 숫자가 같은경우
                             {
-                                map[y, x] += map[y + 1, x];         // 본 숫자에 왼쪽 숫자 더하고
-                                map[y + 1, x] = 0;                  // 왼쪽 숫자 초기화
+                                map[y, x] += map[y + 1, x];         // 본 숫자에 아래쪽 숫자 더하고
+                                map[y + 1, x] = 0;                  // 아래쪽 숫자 초기화
                             }
                             else { /*pass*/ }
                         }
                     }
                 }
+                Make_2();
             }
             else if (playerInput.KeyChar == 's') // 아래로 이동
             {
                 for (int x = 0; x < mapSize; x++)
                 {
-                    for (int i = 0; i < mapSize; i++)           // 맵 크기 만큼 x정렬 반복
+                    for (int i = 0; i < mapSize; i++)           // 맵 크기 만큼 y정렬 반복
                     {
                         for (int y = mapSize - 1; y > 0; y--)
                         {
-                            if (map[y, x] == 0)                     // 본 숫자가 0인 경우
+                            if (map[y, x] == 0)                 // 본 숫자가 0인 경우
                             {
-                                temp = map[y-1, x];           // 0을 맨 왼쪽으로 밈
+                                temp = map[y-1, x];             // 0을 위쪽으로 밈
                                 map[y-1, x] = map[y, x];
                                 map[y, x] = temp;
                             }
-                            else if (map[y-1, x] == map[y, x])    // 본 숫자가 0이 아니고 본 숫자와 왼쪽 숫자가 같은경우
+                            else if (map[y-1, x] == map[y, x])  // 본 숫자가 0이 아니고 본 숫자와 위쪽 숫자가 같은경우
                             {
-                                map[y, x] += map[y-1, x];         // 본 숫자에 왼쪽 숫자 더하고
-                                map[y-1, x] = 0;                  // 왼쪽 숫자 초기화
+                                map[y, x] += map[y-1, x];       // 본 숫자에 위쪽 숫자 더하고
+                                map[y-1, x] = 0;                // 위쪽 숫자 초기화
                             }
                             else { /*pass*/ }
                         }
                     }
                 }
+                Make_2();
             }
             else if (playerInput.KeyChar == 'a') // 왼쪽으로 이동
             {
                 for (int y = 0; y < mapSize; y++)
                 {
-                    for (int i = 0; i < mapSize; i++)           // 맵 크기 만큼 x정렬 반복
+                    for (int i = 0; i < mapSize; i++)               // 맵 크기 만큼 x정렬 반복
                     {
                         for (int x = 0; x < mapSize - 1; x++)
                         {
                             if (map[y, x] == 0)                     // 본 숫자가 0인 경우
                             {
-                                temp = map[y, x + 1];           // 오른쪽 으로 밈
+                                temp = map[y, x + 1];               // 오른쪽 으로 밈
                                 map[y, x + 1] = map[y, x];
                                 map[y, x] = temp;
                             }
-                            else if (map[y, x + 1] == map[y, x])    // 본 숫자가 0이 아니고 본 숫자와 왼쪽 숫자가 같은경우
+                            else if (map[y, x + 1] == map[y, x])    // 본 숫자가 0이 아니고 본 숫자와 오른쪽 숫자가 같은경우
                             {
-                                map[y, x] += map[y, x + 1];         // 본 숫자에 왼쪽 숫자 더하고
-                                map[y, x + 1] = 0;                  // 왼쪽 숫자 초기화
+                                map[y, x] += map[y, x + 1];         // 본 숫자에 오른쪽 숫자 더하고
+                                map[y, x + 1] = 0;                  // 오른쪽 숫자 초기화
                             }
                             else { /*pass*/ }
                         }
                     }
                 }
+                Make_2();
             }
             else if (playerInput.KeyChar == 'd')                // 오른쪽으로 이동
             {
-                for(int y = 0; y < mapSize; y++) 
+                for(int y = 0; y < mapSize; y++)
                 {
                     for (int i = 0; i < mapSize; i++)           // 맵 크기 만큼 x정렬 반복
                     {
@@ -229,7 +228,7 @@ namespace _230616_WarmUp
                         {
                             if (map[y, x] == 0)                     // 본 숫자가 0인 경우
                             {
-                                temp = map[y, x - 1];           // 0을 맨 왼쪽으로 밈
+                                temp = map[y, x - 1];               // 0을 왼쪽으로 밈
                                 map[y, x - 1] = map[y, x];
                                 map[y, x] = temp;
                             }
@@ -242,6 +241,11 @@ namespace _230616_WarmUp
                         }
                     }
                 }
+                Make_2();
+            }
+            else
+            {
+                return;
             }
         }
 
