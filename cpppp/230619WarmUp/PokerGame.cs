@@ -47,7 +47,7 @@ namespace _230619WarmUp
         System.ConsoleKeyInfo playerInput;
         System.ConsoleKeyInfo playerInput1;
 
-        int playerMoney = 5000;
+        int playerMoney = 10000;
         int playerBet;
 
         public void Play_Game()
@@ -75,7 +75,7 @@ namespace _230619WarmUp
                 Console.SetCursorPosition(0, 16);
                 Console.Write("                                                                          ");
                 Console.SetCursorPosition(0, 15);
-                Console.Write("베팅하실 금액을 입력하세요 (최소 300원): ");
+                Console.Write("베팅하실 금액을 입력하세요 (최소 500원): ");
                 int.TryParse(Console.ReadLine(), out playerBet);
                 if (playerBet > playerMoney)
                 {
@@ -83,9 +83,9 @@ namespace _230619WarmUp
                     Thread.Sleep(800);
                     continue;
                 }
-                else if (playerBet < 300)
+                else if (playerBet < 500)
                 {
-                    Console.WriteLine("최소 배팅금액은 300원입니다");
+                    Console.WriteLine("최소 배팅금액은 500원입니다");
                     Thread.Sleep(800);
                     continue;
                 }
@@ -195,7 +195,7 @@ namespace _230619WarmUp
                     if (playerLevel == computerLevel)
                     {
                         Compare();
-                        Thread.Sleep(800);
+                        Thread.Sleep(1500);
                         Clear();
                         Clear_Cards();
                         break;
@@ -204,7 +204,7 @@ namespace _230619WarmUp
                     {
                         Console.WriteLine("플레이어의 승리입니다");
                         playerMoney += playerBet;
-                        Thread.Sleep(800);
+                        Thread.Sleep(1500);
                         Clear();
                         Clear_Cards();
                         break;
@@ -213,7 +213,7 @@ namespace _230619WarmUp
                     {
                         Console.WriteLine("컴퓨터의 승리입니다");
                         playerMoney -= playerBet;
-                        Thread.Sleep(800);
+                        Thread.Sleep(1500);
                         Clear();
                         Clear_Cards();
                         break;
@@ -910,7 +910,7 @@ namespace _230619WarmUp
                 {
                     string[] splitStr = { "_", "." };
                     tempPrint = computerCards[x].cardPattern.Split(splitStr, StringSplitOptions.RemoveEmptyEntries);
-                    Console.SetCursorPosition(x * 10, y + 1);
+                    Console.SetCursorPosition(x * 7, y + 1);
                     if (y == 0)
                     {
                         Console.WriteLine("┌──────┐");
@@ -961,14 +961,14 @@ namespace _230619WarmUp
         void Print_PlayerCard()
         {
             Console.SetCursorPosition(0, 7);
-            Console.Write("소지금:{0,8} 플레이어의 카드", playerMoney);
+            Console.Write("소지금:{0,8}    플레이어의 카드", playerMoney);
             for (int x = 0; x < 5; x++)
             {
                 for (int y = 7; y < 13; y++)
                 {
                     string[] splitStr = { "_", "." };
                     tempPrint = playerCards[x].cardPattern.Split(splitStr, StringSplitOptions.RemoveEmptyEntries);
-                    Console.SetCursorPosition(x * 10, y + 1);
+                    Console.SetCursorPosition(x * 7, y + 1);
                     if (y == 7)
                     {
                         Console.WriteLine("┌──────┐");
@@ -1027,7 +1027,7 @@ namespace _230619WarmUp
             considerTriple = 0;
             considerTwoPair = 0;
             considerPair = 0;
-
+            // 로티플 체크
             for (int i = 0; i < 3; i ++)
             {
                 if ((computerCards[i].cardNumbers%13 == 12) && (computerCards[i+1].cardNumbers % 13 == 11)
@@ -1048,7 +1048,7 @@ namespace _230619WarmUp
                     }
                 }
             }
-
+            // 스티플 체크
             for (int i = 0; i < 3; i ++)
             {
                 if ((computerCards[i].cardNumbers % 13 - 1 == computerCards[i + 1].cardNumbers % 13)
@@ -1070,7 +1070,7 @@ namespace _230619WarmUp
                     }
                 }
             }
-
+            // 포카드 체크
             for (int i = 0; i < 4; i ++)
             {
                 if (computerCards[i].cardNumbers % 13 == computerCards[i + 3].cardNumbers % 13)
@@ -1079,7 +1079,7 @@ namespace _230619WarmUp
                     return;
                 }
             }
-
+            // 트리플 + 풀하우스 체크
             for(int i = 0; i < 5; i++)
             {
                 if ((computerCards[i].cardNumbers % 13 == computerCards[i + 1].cardNumbers % 13)
@@ -1096,7 +1096,7 @@ namespace _230619WarmUp
                     considerTriple += 1;
                 }
             }
-
+            // 페어스타팅 풀하우스 체크
             for(int i = 0; i < 6; i++)
             {
                 if (computerCards[i].cardNumbers % 13 == computerCards[i + 1].cardNumbers % 13)
@@ -1110,10 +1110,9 @@ namespace _230619WarmUp
                             return;
                         }
                     }
-                    considerPair += 1;
                 }
             }
-
+            // 투 페어 + 원 페어 체크
             for (int i = 0; i < 6; i++)
             {
                 if (computerCards[i].cardNumbers % 13 == computerCards[i + 1].cardNumbers % 13)
@@ -1134,7 +1133,7 @@ namespace _230619WarmUp
             diaSameCount = 0;
             heartSameCount = 0;
             cloverSameCount = 0;
-
+            // 플러쉬 체크
             for (int i = 0; i < 7; i++)
             {
                 if (computerCards[i].cardNumbers / 13 == 0)
@@ -1244,7 +1243,7 @@ namespace _230619WarmUp
             considerPlayerTriple = 0;
             considerPlayerTwoPair = 0;
             considerPlayerPair = 0;
-
+            // 로티플 체크
             for (int i = 0; i < 1; i++)
             {
                 if ((playerCards[i].cardNumbers % 13 == 12) && (playerCards[i + 1].cardNumbers % 13 == 11)
@@ -1265,7 +1264,7 @@ namespace _230619WarmUp
                     }
                 }
             }
-
+            // 스티플 체크
             for (int i = 0; i < 1; i++)
             {
                 if ((playerCards[i].cardNumbers % 13 - 1 == playerCards[i + 1].cardNumbers % 13)
@@ -1287,7 +1286,7 @@ namespace _230619WarmUp
                     }
                 }
             }
-
+            // 포카드 체크
             for (int i = 0; i < 2; i++)
             {
                 if (playerCards[i].cardNumbers % 13 == playerCards[i + 3].cardNumbers % 13)
@@ -1296,7 +1295,7 @@ namespace _230619WarmUp
                     return;
                 }
             }
-
+            // 풀하우스 + 트리플 체크
             for (int i = 0; i < 3; i++)
             {
                 if ((playerCards[i].cardNumbers % 13 == playerCards[i + 1].cardNumbers % 13)
@@ -1313,7 +1312,7 @@ namespace _230619WarmUp
                     considerPlayerTriple += 1;
                 }
             }
-
+            // 페어 스타팅 풀하우스 체크
             for (int i = 0; i < 4; i++)
             {
                 if (playerCards[i].cardNumbers % 13 == playerCards[i + 1].cardNumbers % 13)
@@ -1327,10 +1326,9 @@ namespace _230619WarmUp
                             return;
                         }
                     }
-                    considerPlayerPair += 1;
                 }
             }
-
+            // 투 페어 + 원 페어 체크
             for (int i = 0; i < 4; i++)
             {
                 if (playerCards[i].cardNumbers % 13 == playerCards[i + 1].cardNumbers % 13)
@@ -1351,7 +1349,7 @@ namespace _230619WarmUp
             playerDiaSameCount = 0;
             playerHeartSameCount = 0;
             playerCloverSameCount = 0;
-
+            // 플러쉬 체크
             for (int i = 0; i < 5; i++)
             {
                 if (playerCards[i].cardNumbers / 13 == 0)
@@ -1397,7 +1395,7 @@ namespace _230619WarmUp
         // 플레이어 족보 표출
         int Print_PlayerLevel()
         {
-            Console.SetCursorPosition(32, 7);
+            Console.SetCursorPosition(35, 7);
             if (considerPlayerRoyalStraightFlush == 1)
             {
                 Console.Write("로얄스트레이트 플러시");

@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _230619WarmUp
+namespace _230620_Quest
 {
-    public class Program
-    { 
+    internal class Program
+    {
         static void Main(string[] args)
         {
-            PokerGame myGame = new PokerGame();
-            myGame.Play_Game();
+            GameHard normal = new GameHard();
+            normal.Play_Game();
         }
     }
 }
