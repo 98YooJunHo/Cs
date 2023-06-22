@@ -6,34 +6,38 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Data;
+using System.Runtime.InteropServices;
 
 namespace _230621_Warmup
 {
     public class WallRunner
     {
         System.ConsoleKeyInfo playerInput;
-        const int MAP_SIZE_Y = 17;
-        const int MAP_SIZE_X = 32;
-        const char MONSTER = 'δ';
-        const char PLAYER = '♥';
-        const char WALL = '■';
-        const char GROUND = ' ';
-        const char DEATH = '†';
+        public const int MAP_SIZE_Y = 17;
+        public const int MAP_SIZE_X = 32;
+        public const char MONSTER = 'δ';
+        public const char PLAYER = '♥';
+        public const char WALL = '■';
+        public const char GROUND = ' ';
+        public const char DEATH = '†';
         int player_Y = MAP_SIZE_Y / 2;
         int player_X = MAP_SIZE_X / 2;
         char[,] map = new char[MAP_SIZE_Y, MAP_SIZE_X];
         int moveCount = 0;
+        int totalMoveCount = 0;
         int death = 0;
         int score = 0;
         int maxScore = 0;
         int regame = 0;
+        List<MopPosition> enemy = new List<MopPosition>();
 
         public void Play_Game()
         {
             death = 0;
-            regame = 0;
             score = 0;
             moveCount = 0;
+            totalMoveCount = 0;
+            enemy.Clear();
             Clear();
             Make_Map();
             Make_Wall();
@@ -46,6 +50,7 @@ namespace _230621_Warmup
 
                     if(regame > 0)
                     {
+                        regame = 0;
                         Play_Game();
                     }
 
@@ -56,17 +61,17 @@ namespace _230621_Warmup
 
                 }
 
-                score = moveCount * 100;
+                score = totalMoveCount * 100;
                 if(score > maxScore)
                 {
                     maxScore = score;
                 }
                 Print_Map();
                 Move_Player();
-                Move_Monster();
-                if (moveCount != 0 && moveCount % 10 == 0)
+                if (moveCount == 10)
                 {
                     Make_Monster();
+                    moveCount = 0;
                 }
             }
         }
@@ -75,7 +80,7 @@ namespace _230621_Warmup
         {
             for(int i = 0; i < MAP_SIZE_Y+3; i++)
             {
-                Console.WriteLine("                                                                                                                       ");
+                Console.WriteLine("                                                                                                                                 ");
             }
         }
 
@@ -157,6 +162,8 @@ namespace _230621_Warmup
                             map[player_Y, player_X] = temp;
                             player_Y -= 1;
                             moveCount++;
+                            totalMoveCount++;
+                            Move_Monster();
                             break;
                         }
                         break;
@@ -177,6 +184,8 @@ namespace _230621_Warmup
                             map[player_Y, player_X] = temp;
                             player_Y += 1;
                             moveCount++;
+                            totalMoveCount++;
+                            Move_Monster();
                             break;
                         }
                         break;
@@ -197,6 +206,8 @@ namespace _230621_Warmup
                             map[player_Y, player_X] = temp;
                             player_X -= 1;
                             moveCount++;
+                            totalMoveCount++;
+                            Move_Monster();
                             break;
                         }
                         break;
@@ -217,6 +228,8 @@ namespace _230621_Warmup
                             map[player_Y, player_X] = temp;
                             player_X += 1;
                             moveCount++;
+                            totalMoveCount++;
+                            Move_Monster();
                             break;
                         }
                         break;
@@ -267,6 +280,10 @@ namespace _230621_Warmup
                 if (map[indexY, indexX] == GROUND)
                 {
                     map[indexY, indexX] = MONSTER;
+                    MopPosition mop = new MopPosition();
+                    mop.pos[0] = indexY;
+                    mop.pos[1] = indexX;
+                    enemy.Add(mop);
                     break;
                 }
                 else
@@ -281,128 +298,461 @@ namespace _230621_Warmup
 
         void Move_Monster()
         {
-
-            for(int y = 0; y < MAP_SIZE_Y; y++)
+            for(int i = 0; i < enemy.Count; i++)
             {
-                for(int x = 0; x < MAP_SIZE_X; x++)
+                int yDiff = player_Y - enemy[i].pos[0];
+                int xDiff = player_X - enemy[i].pos[1];
+                if ((xDiff * xDiff) > (yDiff * yDiff))
                 {
-                    if (map[y, x] == MONSTER)
+                    if (xDiff < 0)
                     {
-                        int xDiff = player_X - x;
-                        int yDiff = player_Y - y;
-
-                        if((xDiff*xDiff)>(yDiff*yDiff))
+                        if (map[enemy[i].pos[0], enemy[i].pos[1] - 1] == GROUND)
                         {
-                            if (xDiff < 0)
-                            {
-                                if (map[y, x - 1] == GROUND)
-                                {
-                                    char temp = map[y, x - 1];
-                                    map[y, x - 1] = map[y, x];
-                                    map[y, x] = temp;
-                                    xDiff = 0;
-                                    yDiff = 0;
-                                }
-                                else if (map[y, x - 1] == PLAYER)
-                                {
-                                    death += 1;
-                                    return;
-                                }
-                            }
-
-                            if (xDiff > 0)
-                            {
-                                if (map[y, x + 1] == GROUND)
-                                {
-                                    char temp = map[y, x + 1];
-                                    map[y, x + 1] = map[y, x];
-                                    map[y, x] = temp;
-                                    if (x < MAP_SIZE_X - 2)
-                                    { 
-                                        x += 1;
-                                    }
-                                    xDiff = 0;
-                                    yDiff = 0;
-                                }
-                                else if (map[y, x + 1] == PLAYER)
-                                {
-                                    death += 1;
-                                    return;
-                                }
-                            }
+                            char temp = map[enemy[i].pos[0], enemy[i].pos[1] - 1];
+                            map[enemy[i].pos[0], enemy[i].pos[1] - 1] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                            map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                            enemy[i].pos[1] -= 1;
                         }
-
-                        if ((xDiff * xDiff) < (yDiff * yDiff))
+                        else if (map[enemy[i].pos[0], enemy[i].pos[1] - 1] == PLAYER)
+                        {
+                            death += 1;
+                            return;
+                        }
+                        else if (map[enemy[i].pos[0], enemy[i].pos[1] - 1] == WALL)
                         {
                             if (yDiff < 0)
                             {
-                                if (map[y - 1, x] == GROUND)
+                                if (map[enemy[i].pos[0] - 1, enemy[i].pos[1]] == GROUND)
                                 {
-                                    char temp = map[y - 1, x];
-                                    map[y - 1, x] = map[y, x];
-                                    map[y, x] = temp;
-                                    xDiff = 0;
-                                    yDiff = 0;
+                                    char temp = map[enemy[i].pos[0] - 1, enemy[i].pos[1]];
+                                    map[enemy[i].pos[0] - 1, enemy[i].pos[1]] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[0] -= 1;
                                 }
-                                else if (map[y - 1, x] == PLAYER)
+                                else if (map[enemy[i].pos[0] - 1, enemy[i].pos[1]] == GROUND)
                                 {
                                     death += 1;
                                     return;
                                 }
                             }
-
-                            if (yDiff > 0)
+                            else if (yDiff > 0)
                             {
-                                if (map[y + 1, x] == GROUND)
+                                if (map[enemy[i].pos[0] + 1, enemy[i].pos[1]] == GROUND)
                                 {
-                                    char temp = map[y + 1, x];
-                                    map[y + 1, x] = map[y, x];
-                                    map[y, x] = temp;
-                                    if (y < MAP_SIZE_Y - 2)
-                                    {
-                                        y += 1;
-                                    }
-                                    xDiff = 0;
-                                    yDiff = 0;
+                                    char temp = map[enemy[i].pos[0] + 1, enemy[i].pos[1]];
+                                    map[enemy[i].pos[0] + 1, enemy[i].pos[1]] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[0] += 1;
                                 }
-                                else if (map[y + 1, x] == PLAYER)
+                                else if (map[enemy[i].pos[0] + 1, enemy[i].pos[1]] == GROUND)
+                                {
+                                    death += 1;
+                                    return;
+                                }
+                            }
+                            else if(yDiff == 0)
+                            {
+                                if (map[enemy[i].pos[0] - 1, enemy[i].pos[1]] == GROUND)
+                                {
+                                    char temp = map[enemy[i].pos[0] - 1, enemy[i].pos[1]];
+                                    map[enemy[i].pos[0] - 1, enemy[i].pos[1]] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[0] -= 1;
+                                }
+                                else if (map[enemy[i].pos[0] - 1, enemy[i].pos[1]] == PLAYER)
+                                {
+                                    death += 1;
+                                    return;
+                                }
+                                else if (map[enemy[i].pos[0] + 1, enemy[i].pos[1]] == GROUND)
+                                {
+                                    char temp = map[enemy[i].pos[0] + 1, enemy[i].pos[1]];
+                                    map[enemy[i].pos[0] + 1, enemy[i].pos[1]] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[0] += 1;
+                                }
+                                else if (map[enemy[i].pos[0] + 1, enemy[i].pos[1]] == PLAYER)
                                 {
                                     death += 1;
                                     return;
                                 }
                             }
                         }
-
-                        if ((xDiff * xDiff) == (yDiff * yDiff))
+                    }
+                    else if (xDiff > 0)
+                    {
+                        if (map[enemy[i].pos[0], enemy[i].pos[1] + 1] == GROUND)
                         {
-                            if (xDiff < 0)
+                            char temp = map[enemy[i].pos[0], enemy[i].pos[1] + 1];
+                            map[enemy[i].pos[0], enemy[i].pos[1] + 1] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                            map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                            enemy[i].pos[1] += 1;
+                        }
+                        else if (map[enemy[i].pos[0], enemy[i].pos[1] + 1] == PLAYER)
+                        {
+                            death += 1;
+                            return;
+                        }
+                        else if (map[enemy[i].pos[0], enemy[i].pos[1] + 1] == WALL)
+                        {
+                            if (yDiff < 0)
                             {
-                                if (map[y, x - 1] == GROUND)
+                                if (map[enemy[i].pos[0] - 1, enemy[i].pos[1]] == GROUND)
                                 {
-                                    char temp = map[y, x - 1];
-                                    map[y, x - 1] = map[y, x];
-                                    map[y, x] = temp;
-                                    xDiff = 0;
-                                    yDiff = 0;
+                                    char temp = map[enemy[i].pos[0] - 1, enemy[i].pos[1]];
+                                    map[enemy[i].pos[0] - 1, enemy[i].pos[1]] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[0] -= 1;
                                 }
-                                else if (map[y, x - 1] == PLAYER)
+                                else if (map[enemy[i].pos[0] - 1, enemy[i].pos[1]] == PLAYER)
                                 {
                                     death += 1;
                                     return;
                                 }
                             }
-
-                            if (xDiff > 0)
+                            else if (yDiff > 0)
                             {
-                                if (map[y, x + 1] == GROUND)
+                                if (map[enemy[i].pos[0] + 1, enemy[i].pos[1]] == GROUND)
                                 {
-                                    char temp = map[y, x + 1];
-                                    map[y, x + 1] = map[y, x];
-                                    map[y, x] = temp;
-                                    xDiff = 0;
-                                    yDiff = 0;
+                                    char temp = map[enemy[i].pos[0] + 1, enemy[i].pos[1]];
+                                    map[enemy[i].pos[0] + 1, enemy[i].pos[1]] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[0] += 1;
                                 }
-                                else if (map[y, x + 1] == PLAYER)
+                                else if (map[enemy[i].pos[0] + 1, enemy[i].pos[1]] == PLAYER)
+                                {
+                                    death += 1;
+                                    return;
+                                }
+                            }
+                            else if (yDiff == 0)
+                            {
+                                if (map[enemy[i].pos[0] - 1, enemy[i].pos[1]] == GROUND)
+                                {
+                                    char temp = map[enemy[i].pos[0] - 1, enemy[i].pos[1]];
+                                    map[enemy[i].pos[0] - 1, enemy[i].pos[1]] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[0] -= 1;
+                                }
+                                else if (map[enemy[i].pos[0] - 1, enemy[i].pos[1]] == PLAYER)
+                                {
+                                    death += 1;
+                                    return;
+                                }
+                                else if (map[enemy[i].pos[0] + 1, enemy[i].pos[1]] == GROUND)
+                                {
+                                    char temp = map[enemy[i].pos[0] + 1, enemy[i].pos[1]];
+                                    map[enemy[i].pos[0] + 1, enemy[i].pos[1]] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[0] += 1;
+                                }
+                                else if (map[enemy[i].pos[0] + 1, enemy[i].pos[1]] == PLAYER)
+                                {
+                                    death += 1;
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+                else if ((xDiff * xDiff) < (yDiff * yDiff))
+                {
+                    if (yDiff < 0)
+                    {
+                        if (map[enemy[i].pos[0] - 1, enemy[i].pos[1]] == GROUND)
+                        {
+                            char temp = map[enemy[i].pos[0] - 1, enemy[i].pos[1]];
+                            map[enemy[i].pos[0] - 1, enemy[i].pos[1]] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                            map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                            enemy[i].pos[0] -= 1;
+                        }
+                        else if (map[enemy[i].pos[0] - 1, enemy[i].pos[1]] == PLAYER)
+                        {
+                            death += 1;
+                            return;
+                        }
+                        else if (map[enemy[i].pos[0] - 1, enemy[i].pos[1]] == WALL)
+                        {
+                            if (xDiff < 0)
+                            {
+                                if (map[enemy[i].pos[0], enemy[i].pos[1] - 1] == GROUND)
+                                {
+                                    char temp = map[enemy[i].pos[0], enemy[i].pos[1] - 1];
+                                    map[enemy[i].pos[0], enemy[i].pos[1] - 1] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[1] -= 1;
+                                }
+                                else if (map[enemy[i].pos[0], enemy[i].pos[1] - 1] == PLAYER)
+                                {
+                                    death += 1;
+                                    return;
+                                }
+                            }
+                            else if(xDiff > 0)
+                            {
+                                if (map[enemy[i].pos[0], enemy[i].pos[1] + 1] == GROUND)
+                                {
+                                    char temp = map[enemy[i].pos[0], enemy[i].pos[1] + 1];
+                                    map[enemy[i].pos[0], enemy[i].pos[1] + 1] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[1] += 1;
+                                }
+                                else if (map[enemy[i].pos[0], enemy[i].pos[1] + 1] == PLAYER)
+                                {
+                                    death += 1;
+                                    return;
+                                }
+                            }
+                            else if (xDiff == 0)
+                            {
+                                if (map[enemy[i].pos[0], enemy[i].pos[1] - 1] == GROUND)
+                                {
+                                    char temp = map[enemy[i].pos[0], enemy[i].pos[1] - 1];
+                                    map[enemy[i].pos[0], enemy[i].pos[1] - 1] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[1] -= 1;
+                                }
+                                else if (map[enemy[i].pos[0], enemy[i].pos[1] - 1] == PLAYER)
+                                {
+                                    death += 1;
+                                    return;
+                                }
+                                else if (map[enemy[i].pos[0], enemy[i].pos[1] + 1] == GROUND)
+                                {
+                                    char temp = map[enemy[i].pos[0], enemy[i].pos[1] + 1];
+                                    map[enemy[i].pos[0], enemy[i].pos[1] + 1] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[1] += 1;
+                                }
+                                else if (map[enemy[i].pos[0], enemy[i].pos[1] + 1] == PLAYER)
+                                {
+                                    death += 1;
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    else if (yDiff > 0)
+                    {
+                        if (map[enemy[i].pos[0] + 1, enemy[i].pos[1]] == GROUND)
+                        {
+                            char temp = map[enemy[i].pos[0] + 1, enemy[i].pos[1]];
+                            map[enemy[i].pos[0] + 1, enemy[i].pos[1]] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                            map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                            enemy[i].pos[0] += 1;
+                        }
+                        else if (map[enemy[i].pos[0] + 1, enemy[i].pos[1]] == PLAYER)
+                        {
+                            death += 1;
+                            return;
+                        }
+                        else if (map[enemy[i].pos[0] + 1, enemy[i].pos[1]] == WALL)
+                        {
+                            if (xDiff < 0)
+                            {
+                                if (map[enemy[i].pos[0], enemy[i].pos[1] - 1] == GROUND)
+                                {
+                                    char temp = map[enemy[i].pos[0], enemy[i].pos[1] - 1];
+                                    map[enemy[i].pos[0], enemy[i].pos[1] - 1] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[1] -= 1;
+                                }
+                                else if (map[enemy[i].pos[0], enemy[i].pos[1] - 1] == PLAYER)
+                                {
+                                    death += 1;
+                                    return;
+                                }
+                            }
+                            else if (xDiff > 0)
+                            {
+                                if (map[enemy[i].pos[0], enemy[i].pos[1] + 1] == GROUND)
+                                {
+                                    char temp = map[enemy[i].pos[0], enemy[i].pos[1] + 1];
+                                    map[enemy[i].pos[0], enemy[i].pos[1] + 1] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[1] += 1;
+                                }
+                                else if (map[enemy[i].pos[0], enemy[i].pos[1] + 1] == PLAYER)
+                                {
+                                    death += 1;
+                                    return;
+                                }
+                            }
+                            else if (xDiff == 0)
+                            {
+                                if (map[enemy[i].pos[0], enemy[i].pos[1] - 1] == GROUND)
+                                {
+                                    char temp = map[enemy[i].pos[0], enemy[i].pos[1] - 1];
+                                    map[enemy[i].pos[0], enemy[i].pos[1] - 1] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[1] -= 1;
+                                }
+                                else if (map[enemy[i].pos[0], enemy[i].pos[1] - 1] == PLAYER)
+                                {
+                                    death += 1;
+                                    return;
+                                }
+                                else if (map[enemy[i].pos[0], enemy[i].pos[1] + 1] == GROUND)
+                                {
+                                    char temp = map[enemy[i].pos[0], enemy[i].pos[1] + 1];
+                                    map[enemy[i].pos[0], enemy[i].pos[1] + 1] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[1] += 1;
+                                }
+                                else if (map[enemy[i].pos[0], enemy[i].pos[1] + 1] == PLAYER)
+                                {
+                                    death += 1;
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+                else if ((xDiff * xDiff) == (yDiff * yDiff))
+                {
+                    if (xDiff < 0)
+                    {
+                        if (map[enemy[i].pos[0], enemy[i].pos[1] - 1] == GROUND)
+                        {
+                            char temp = map[enemy[i].pos[0], enemy[i].pos[1] - 1];
+                            map[enemy[i].pos[0], enemy[i].pos[1] - 1] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                            map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                            enemy[i].pos[1] -= 1;
+                        }
+                        else if (map[enemy[i].pos[0], enemy[i].pos[1] - 1] == PLAYER)
+                        {
+                            death += 1;
+                            return;
+                        }
+                        else if (map[enemy[i].pos[0], enemy[i].pos[1] - 1] == WALL)
+                        {
+                            if (yDiff < 0)
+                            {
+                                if (map[enemy[i].pos[0] - 1, enemy[i].pos[1]] == GROUND)
+                                {
+                                    char temp = map[enemy[i].pos[0] - 1, enemy[i].pos[1]];
+                                    map[enemy[i].pos[0] - 1, enemy[i].pos[1]] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[0] -= 1;
+                                }
+                                else if (map[enemy[i].pos[0] - 1, enemy[i].pos[1]] == PLAYER)
+                                {
+                                    death += 1;
+                                    return;
+                                }
+                            }
+                            else if (yDiff > 0)
+                            {
+                                if (map[enemy[i].pos[0] + 1, enemy[i].pos[1]] == GROUND)
+                                {
+                                    char temp = map[enemy[i].pos[0] + 1, enemy[i].pos[1]];
+                                    map[enemy[i].pos[0] + 1, enemy[i].pos[1]] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[0] += 1;
+                                }
+                                else if (map[enemy[i].pos[0] + 1, enemy[i].pos[1]] == PLAYER)
+                                {
+                                    death += 1;
+                                    return;
+                                }
+                            }
+                            else if (yDiff == 0)
+                            {
+                                if (map[enemy[i].pos[0] - 1, enemy[i].pos[1]] == GROUND)
+                                {
+                                    char temp = map[enemy[i].pos[0] - 1, enemy[i].pos[1]];
+                                    map[enemy[i].pos[0] - 1, enemy[i].pos[1]] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[0] -= 1;
+                                }
+                                else if (map[enemy[i].pos[0] - 1, enemy[i].pos[1]] == PLAYER)
+                                {
+                                    death += 1;
+                                    return;
+                                }
+                                else if (map[enemy[i].pos[0] + 1, enemy[i].pos[1]] == GROUND)
+                                {
+                                    char temp = map[enemy[i].pos[0] + 1, enemy[i].pos[1]];
+                                    map[enemy[i].pos[0] + 1, enemy[i].pos[1]] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[0] += 1;
+                                }
+                                else if (map[enemy[i].pos[0] + 1, enemy[i].pos[1]] == PLAYER)
+                                {
+                                    death += 1;
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    else if (xDiff > 0)
+                    {
+                        if (map[enemy[i].pos[0], enemy[i].pos[1] + 1] == GROUND)
+                        {
+                            char temp = map[enemy[i].pos[0], enemy[i].pos[1] + 1];
+                            map[enemy[i].pos[0], enemy[i].pos[1] + 1] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                            map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                            enemy[i].pos[1] += 1;
+                        }
+                        else if (map[enemy[i].pos[0], enemy[i].pos[1] + 1] == PLAYER)
+                        {
+                            death += 1;
+                            return;
+                        }
+                        else if (map[enemy[i].pos[0], enemy[i].pos[1] + 1] == WALL)
+                        {
+                            if (yDiff < 0)
+                            {
+                                if (map[enemy[i].pos[0] - 1, enemy[i].pos[1]] == GROUND)
+                                {
+                                    char temp = map[enemy[i].pos[0] - 1, enemy[i].pos[1]];
+                                    map[enemy[i].pos[0] - 1, enemy[i].pos[1]] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[0] -= 1;
+                                }
+                                else if (map[enemy[i].pos[0] - 1, enemy[i].pos[1]] == PLAYER)
+                                {
+                                    death += 1;
+                                    return;
+                                }
+                            }
+                            else if (yDiff > 0)
+                            {
+                                if (map[enemy[i].pos[0] + 1, enemy[i].pos[1]] == GROUND)
+                                {
+                                    char temp = map[enemy[i].pos[0] + 1, enemy[i].pos[1]];
+                                    map[enemy[i].pos[0] + 1, enemy[i].pos[1]] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[0] += 1;
+                                }
+                                else if (map[enemy[i].pos[0] + 1, enemy[i].pos[1]] == PLAYER)
+                                {
+                                    death += 1;
+                                    return;
+                                }
+                            }
+                            else if (yDiff == 0)
+                            {
+                                if (map[enemy[i].pos[0] - 1, enemy[i].pos[1]] == GROUND)
+                                {
+                                    char temp = map[enemy[i].pos[0] - 1, enemy[i].pos[1]];
+                                    map[enemy[i].pos[0] - 1, enemy[i].pos[1]] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[0] -= 1;
+                                }
+                                else if (map[enemy[i].pos[0] - 1, enemy[i].pos[1]] == PLAYER)
+                                {
+                                    death += 1;
+                                    return;
+                                }
+                                else if (map[enemy[i].pos[0] + 1, enemy[i].pos[1]] == GROUND)
+                                {
+                                    char temp = map[enemy[i].pos[0] + 1, enemy[i].pos[1]];
+                                    map[enemy[i].pos[0] + 1, enemy[i].pos[1]] = map[enemy[i].pos[0], enemy[i].pos[1]];
+                                    map[enemy[i].pos[0], enemy[i].pos[1]] = temp;
+                                    enemy[i].pos[0] += 1;
+                                }
+                                else if (map[enemy[i].pos[0] + 1, enemy[i].pos[1]] == PLAYER)
                                 {
                                     death += 1;
                                     return;
@@ -412,17 +762,17 @@ namespace _230621_Warmup
                     }
                 }
             }
-
         }
 
         void Death()
         {
             map[player_Y, player_X] = DEATH;
             Print_Map();
+            Console.SetCursorPosition(0, MAP_SIZE_Y + 2);
+            Console.WriteLine("               슬라임에 짓밟혔다!               ");
+            Console.WriteLine("               다시하기:r 종료:q                ");
             while (true)
             {
-                Console.WriteLine("               슬라임에 짓밟혔다!               ");
-                Console.WriteLine("               다시하기:r 종료:q                ");
                 playerInput = Console.ReadKey();
                 if (playerInput.Key == ConsoleKey.R)
                 {
@@ -435,7 +785,7 @@ namespace _230621_Warmup
                 }
                 else
                 {
-                    Death();
+                    continue;
                 }
             }
         }
