@@ -141,7 +141,7 @@ namespace _230621_Warmup
 
         void Move_Player()
         {
-            Console.SetCursorPosition(0, 19);
+            Console.SetCursorPosition(0, 18);
             Console.Write("방향키로 이동:");
             playerInput = Console.ReadKey();
             switch (playerInput.Key)
@@ -318,7 +318,7 @@ namespace _230621_Warmup
                             death += 1;
                             return;
                         }
-                        else if (map[enemy[i].pos[0], enemy[i].pos[1] - 1] == WALL)
+                        else if (map[enemy[i].pos[0], enemy[i].pos[1] - 1] == WALL || map[enemy[i].pos[0], enemy[i].pos[1] - 1] == MONSTER)
                         {
                             if (yDiff < 0)
                             {
@@ -393,7 +393,7 @@ namespace _230621_Warmup
                             death += 1;
                             return;
                         }
-                        else if (map[enemy[i].pos[0], enemy[i].pos[1] + 1] == WALL)
+                        else if (map[enemy[i].pos[0], enemy[i].pos[1] + 1] == WALL || map[enemy[i].pos[0], enemy[i].pos[1] + 1] == MONSTER)
                         {
                             if (yDiff < 0)
                             {
@@ -471,7 +471,7 @@ namespace _230621_Warmup
                             death += 1;
                             return;
                         }
-                        else if (map[enemy[i].pos[0] - 1, enemy[i].pos[1]] == WALL)
+                        else if (map[enemy[i].pos[0] - 1, enemy[i].pos[1]] == WALL || map[enemy[i].pos[0] - 1, enemy[i].pos[1]] == MONSTER)
                         {
                             if (xDiff < 0)
                             {
@@ -546,7 +546,7 @@ namespace _230621_Warmup
                             death += 1;
                             return;
                         }
-                        else if (map[enemy[i].pos[0] + 1, enemy[i].pos[1]] == WALL)
+                        else if (map[enemy[i].pos[0] + 1, enemy[i].pos[1]] == WALL || map[enemy[i].pos[0] + 1, enemy[i].pos[1]] == MONSTER)
                         {
                             if (xDiff < 0)
                             {
@@ -624,7 +624,7 @@ namespace _230621_Warmup
                             death += 1;
                             return;
                         }
-                        else if (map[enemy[i].pos[0], enemy[i].pos[1] - 1] == WALL)
+                        else if (map[enemy[i].pos[0], enemy[i].pos[1] - 1] == WALL || map[enemy[i].pos[0], enemy[i].pos[1] - 1] == MONSTER)
                         {
                             if (yDiff < 0)
                             {
@@ -699,7 +699,7 @@ namespace _230621_Warmup
                             death += 1;
                             return;
                         }
-                        else if (map[enemy[i].pos[0], enemy[i].pos[1] + 1] == WALL)
+                        else if (map[enemy[i].pos[0], enemy[i].pos[1] + 1] == WALL || map[enemy[i].pos[0], enemy[i].pos[1] + 1] == MONSTER)
                         {
                             if (yDiff < 0)
                             {

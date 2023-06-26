@@ -23,14 +23,14 @@ namespace _230622_BushBattle
                 Move_Player();
             }
         }
-
+        
+        // 플레이어 이동
         void Move_Player()
         {
             playerInput = Console.ReadKey();
             switch (playerInput.Key)
             {
                 case ConsoleKey.UpArrow:
-                case ConsoleKey.W:
                     {
                         if (map[player_Y - 1, player_X] == NPC)
                         {
@@ -79,7 +79,6 @@ namespace _230622_BushBattle
                         break;
                     }
                 case ConsoleKey.DownArrow:
-                case ConsoleKey.S:
                     {
                         if (map[player_Y + 1, player_X] == NPC)
                         {
@@ -128,7 +127,6 @@ namespace _230622_BushBattle
                         break;
                     }
                 case ConsoleKey.LeftArrow:
-                case ConsoleKey.A:
                     {
                         if (map[player_Y, player_X - 1] == NPC)
                         {
@@ -176,7 +174,6 @@ namespace _230622_BushBattle
                         break;
                     }
                 case ConsoleKey.RightArrow:
-                case ConsoleKey.D:
                     {
                         if (map[player_Y, player_X + 1] == NPC)
                         {
@@ -209,6 +206,7 @@ namespace _230622_BushBattle
                             map[player_Y, player_X] = ' ';
                             player_X += 1;
                             Set_Bush();
+                            Battle();
                             break;
                         }
 
@@ -233,6 +231,7 @@ namespace _230622_BushBattle
             }
         }
 
+        // 맵 출력
         void Print_Map()
         {
             Console.SetCursorPosition(0, 0);
@@ -275,6 +274,7 @@ namespace _230622_BushBattle
             Console.Write("방향키로 이동, 현재 위치: ({0},{1})", player_Y, player_X);
         }
 
+        // 플레이어 정보 출력
         void Print_Info()
         {
             Console.SetCursorPosition(0, 20);
@@ -293,6 +293,7 @@ namespace _230622_BushBattle
 
         }
 
+        // 배틀 정보 출력위치 클리어
         void Clear_Battle()
         {
             for (int i = 0; i < 4; i ++)
@@ -302,11 +303,12 @@ namespace _230622_BushBattle
             }
         }
 
+        // 배틀 및 배틀 정보 출력
         void Battle()
         {
             int fightRate = random.Next(1, 101);
 
-            if(fightRate <= 36)
+            if(fightRate <= 20)
             {
                 Print_Map();
                 Monster newMonster = new Monster();
@@ -314,7 +316,7 @@ namespace _230622_BushBattle
                 for (int i = 0; i < 25; i++)
                 {
                     Console.Write("!");
-                    Thread.Sleep(50);
+                    Thread.Sleep(30);
                 }
                 Console.SetCursorPosition(MAP_SIZE_X*2 + 1, 1);
                 Console.Write("    몬스터를 만났습니다!    ");
@@ -379,5 +381,4 @@ namespace _230622_BushBattle
             }
         }
     }
-
 }

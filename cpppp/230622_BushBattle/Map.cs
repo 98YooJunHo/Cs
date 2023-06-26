@@ -19,6 +19,7 @@ namespace _230622_BushBattle
         protected const char BUSH = '∥';
         protected const char NPC = '?';
         
+        // 맵 생성
         public void Make_Map()
         {
             npc_Y = MAP_SIZE_Y / 10 + 1;
@@ -53,6 +54,7 @@ namespace _230622_BushBattle
             }
         }
 
+        // 부쉬 체크
         public void Set_Bush()
         {
             for(int y = 1; y < (MAP_SIZE_Y / 5) * 2; y ++)
